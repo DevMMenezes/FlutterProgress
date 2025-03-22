@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quiz/questao.dart';
-import 'package:quiz/resposta.dart';
+import 'package:quiz/questionario.dart';
 
 main() => runApp(QuizApp());
 
@@ -13,30 +12,48 @@ class QuizApp extends StatefulWidget {
 
 class _QuizAppState extends State<QuizApp> {
   var _perguntaSelecionada = 0;
+  var _notaTotal = 0.0;
 
   final List<Map> perguntas = const [
     {
       'texto': 'Qual é a sua cor favorita?',
-      'respostas': ['Preto', 'Vermelho', 'Amarelo'],
+      'respostas': [
+        {'texto': 'Preto', 'nota': 5},
+        {'texto': 'Vermelho', 'nota': 8},
+        {'texto': 'Amarelo', 'nota': 6},
+      ],
     },
     {
       'texto': 'Qual é o seu animal favorito?',
-      'respostas': ['Cobra', 'Leao', 'Gato'],
+      'respostas': [
+        {'texto': 'Cobra', 'nota': 5},
+        {'texto': 'Leao', 'nota': 4},
+        {'texto': 'Gato', 'nota': 8},
+      ],
     },
     {
       'texto': 'Qual é casa favorita?',
-      'respostas': ['Ap', 'Casa', 'Mansão'],
+      'respostas': [
+        {'texto': 'Ap', 'nota': 8},
+        {'texto': 'Casa', 'nota': 9},
+        {'texto': 'Mansão', 'nota': 10},
+      ],
     },
     {
       'texto': 'Qual é o num sei o que lá?',
-      'respostas': ['Sei não', 'Sei lá', 'Num sei'],
+      'respostas': [
+        {'texto': 'Sei não', 'nota': 5},
+        {'texto': 'Sei lá', 'nota': 6},
+        {'texto': 'Num sei', 'nota': 7},
+      ],
     },
   ];
 
-  void _responder() {
+  void _responder(double notaTotal) {
     if (temProximaPergunta) {
       setState(() {
         _perguntaSelecionada++;
+        _notaTotal += notaTotal;
       });
     }
   }
@@ -53,14 +70,6 @@ class _QuizAppState extends State<QuizApp> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> respostasTexto =
-        temProximaPergunta ? perguntas[_perguntaSelecionada]['respostas'] : [];
-
-    List<Widget> respostas =
-        respostasTexto
-            .map((e) => Resposta(texto: e, onSelecao: _responder))
-            .toList();
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -68,33 +77,13 @@ class _QuizAppState extends State<QuizApp> {
           title: Text('Perguntas'),
           backgroundColor: Colors.amber,
         ),
-        body:
-            temProximaPergunta
-                ? Column(
-                  children: [
-                    Questao(texto: perguntas[_perguntaSelecionada]['texto']),
-                    ...respostas,
-                  ],
-                )
-                : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 30,
-                  children: [
-                    Center(
-                      child: Text(
-                        'Parabéns Amigãooo!',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.amber,
-                      ),
-                      onPressed: _retornarAoInicio,
-                      child: Text('Retornar'),
-                    ),
-                  ],
-                ),
+        body: Questionario(
+          perguntaSelecionada: _perguntaSelecionada,
+          perguntas: perguntas,
+          onResponder: _responder,
+          onRetornarAoInicio: _retornarAoInicio,
+          notaTotal: _notaTotal,
+        ),
       ),
     );
   }
